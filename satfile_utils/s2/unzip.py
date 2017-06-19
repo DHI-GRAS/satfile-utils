@@ -75,3 +75,22 @@ def open_bandfiles_in_archive(infile, bands, tile=None):
                     'Reading band {} (for tile {}) from zip file {} ...'
                     ''.format(band, tile, infile))
             yield open_band_in_archive(zipf, band, tile=tile)
+
+
+def get_names_in_file(infile):
+    with zipfile.ZipFile(infile) as zipf:
+        return zipf.namelist()
+
+
+def generate_member_url(infile, memberpath):
+    return 'zip://' + infile + '!' + memberpath
+
+
+def get_bandfile_urls(infile, bands, tile=None):
+    names = get_names_in_file(infile)
+    urls = []
+    for band in bands:
+        bfpath = find_band_file_in_archive(names, band=band, tile=tile)
+        url = generate_member_url(infile, bfpath)
+        urls.append(url)
+    return urls
