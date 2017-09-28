@@ -87,6 +87,18 @@ def generate_member_url(infile, memberpath):
 
 
 def get_bandfile_urls(infile, bands, tile=None):
+    """Get URLs to band files in ZIP archive
+
+    Parameters
+    ----------
+    infile : str
+        path to .zip file
+    bands : list of str
+        bands to get
+    tile : str, optional
+        tile to get bands from
+        required for old format multi-tile products
+    """
     names = get_names_in_file(infile)
     urls = []
     for band in bands:
