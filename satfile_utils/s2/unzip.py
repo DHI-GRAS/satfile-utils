@@ -29,15 +29,34 @@ def get_band_fnpattern(band, tile=None):
     return fnpattern
 
 
-def find_band_file_unzipped(folder, band, tile=None):
+def find_band_file_unzipped_SAFE(folder, band, tile=None):
+    """Find band files in unzipped SAFE folder
+
+    Parameters
+    ----------
+    folder : str
+        path to unzipped SAFE product
+    band : int or str
+        band name
+    tile : str, optional
+        tile for multi-tile products
+
+    Returns
+    -------
+    str : path to matching band file
+    """
     fnpattern = get_band_fnpattern(band, tile=tile)
-    pattern = os.path.join(folder, fnpattern)
+    if tile is None:
+        granule_folder_pattern = '*'
+    else:
+        granule_folder_pattern = '*{}*'.format(tile)
+    pattern = os.path.join(folder, 'GRANULE', granule_folder_pattern, 'IMG_DATA', fnpattern)
     try:
         files = glob.glob(pattern)
         if len(files) > 1:
-            logger.warn(
-                    'More than one band file found with pattern: \'{}\'. '
-                    'Using only first.'.format(pattern))
+            raise ValueError(
+                    'Found more than one matching file: {}. Specify `tile`.'
+                    .format(files))
         return files[0]
     except IndexError:
         raise RuntimeError(
@@ -50,31 +69,14 @@ def find_band_file_in_archive(names, band, tile=None):
     try:
         files = list(fnmatch.filter(names, fnpattern))
         if len(files) > 1:
-            logger.warn(
-                    'More than one band file found with pattern: \'{}\'. '
-                    'Using only first.'.format(fnpattern))
+            raise ValueError(
+                    'Found more than one matching file: {}. Specify `tile`.'
+                    .format(files))
         return files[0]
     except IndexError:
         raise RuntimeError(
                 'Unable to find file for band {} and tile {} in list {}'
                 ''.format(band, tile, names))
-
-
-def open_band_in_archive(zipf, band, tile=None):
-    names = zipf.namelist()
-    name = find_band_file_in_archive(names, band, tile=tile)
-    logger.debug(
-            'Found file {} for band {} (and tile {}).'.format(name, band, tile))
-    return zipf.open(name)
-
-
-def open_bandfiles_in_archive(infile, bands, tile=None):
-    with zipfile.ZipFile(infile) as zipf:
-        for band in bands:
-            logger.info(
-                    'Reading band {} (for tile {}) from zip file {} ...'
-                    ''.format(band, tile, infile))
-            yield open_band_in_archive(zipf, band, tile=tile)
 
 
 def get_names_in_file(infile):
