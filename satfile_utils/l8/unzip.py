@@ -62,7 +62,7 @@ def open_bandfiles_in_archive(infile, bands):
             yield open_band_in_archive(tar, band)
 
 
-def get_names_in_file(infile):
+def _get_names_in_file(infile):
     with tarfile.open(infile) as tar:
         return tar.getnames()
 
@@ -81,7 +81,7 @@ def get_bandfile_urls(infile, bands):
     bands : list of str
         bands to get
     """
-    names = get_names_in_file(infile)
+    names = _get_names_in_file(infile)
     urls = []
     for band in bands:
         bfpath = find_band_file(names, band=band)
