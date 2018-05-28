@@ -68,7 +68,7 @@ def _get_names_in_file(infile):
 
 
 def generate_member_url(infile, memberpath):
-    return 'tar://' + infile + '!' + memberpath
+    return 'tar://' + infile + '!/' + memberpath.lstrip('.').lstrip('/')
 
 
 def get_bandfile_urls(infile, bands):
