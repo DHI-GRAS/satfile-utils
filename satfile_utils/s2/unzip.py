@@ -66,6 +66,7 @@ def find_band_file_unzipped_SAFE(folder, band, tile=None):
 
 def find_band_file_in_archive(names, band, tile=None):
     fnpattern = get_band_fnpattern(band, tile=tile)
+    pattern = '*IMG_DATA/' + fnpattern
     try:
         files = list(fnmatch.filter(names, fnpattern))
         if len(files) > 1:
